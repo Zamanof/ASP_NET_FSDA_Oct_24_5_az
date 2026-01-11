@@ -1,0 +1,12 @@
+﻿@page
+@model ASP_NET_03._Razor_Pages_Product_site.Pages.ProductsModel
+
+
+@if (Model.Products.Any())
+{
+    <h3>Products: </h3>
+    @foreach (var product in Model.Products.ToList())
+    {
+        <p><a href="#">@product.Name</a></p>
+    }
+}

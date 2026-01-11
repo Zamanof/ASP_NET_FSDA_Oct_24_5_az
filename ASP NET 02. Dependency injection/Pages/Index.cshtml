@@ -1,0 +1,29 @@
+﻿@page
+@using ASP_NET_02._Dependency_injection.Models
+@model IndexModel
+@{
+    ViewData["Title"] = "Products";
+    var products
+    = ViewData["Products"] as IEnumerable<Product>;
+}
+
+<div class="">
+    <h1 class="display-4 text-center">Products</h1>
+    @if (products!.Any())
+    {
+        <div>
+            <ol class="list-group">
+                @foreach(var product in products)
+                {
+                    <li class="list-group-item">
+                        <strong>@product.Name</strong> - <em>@product.Description</em>
+                    </li>
+                }
+            </ol>
+        </div>
+    }
+    else
+    {
+        <div>No Data</div>
+    }
+</div>
