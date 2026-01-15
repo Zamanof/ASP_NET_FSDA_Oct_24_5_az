@@ -14,7 +14,7 @@ public class ProductRepository : IProductRepository
             .RuleFor(p => p.Name, f => f.Commerce.Product())
             .RuleFor(p => p.Description, f => f.Commerce.ProductDescription())
             .RuleFor(p => p.Count, f => f.Random.UInt(1))
-            .RuleFor(p => p.Price, f => f.Random.Decimal(1))
+            .RuleFor(p => p.Price, f => f.Random.Decimal(1, 500))
             .RuleFor(p=> p.IsAvailable, true);
 
         _products.AddRange(faker.GenerateBetween(30, 30));

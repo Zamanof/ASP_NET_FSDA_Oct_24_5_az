@@ -1,7 +1,5 @@
-using ASP_NET_03._Razor_Pages_Product_site.Data;
 using ASP_NET_03._Razor_Pages_Product_site.Models;
 using ASP_NET_03._Razor_Pages_Product_site.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ASP_NET_03._Razor_Pages_Product_site.Pages

@@ -1,0 +1,51 @@
+﻿@page 
+@model ASP_NET_03._Razor_Pages_Product_site.Pages.ProductModel
+<div class="container mt-4">
+
+    @if (Model.Product is null)
+    {
+        <div class="alert alert-warning text-center">
+            <h5 class="mb-0">No data available</h5>
+        </div>
+    }
+    else
+    {
+        <h3 class="mb-3">Product</h3>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Count</th>
+                        <th>Available</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>@Model.Product.Id</td>
+                        <td>@Model.Product.Name</td>
+                        <td>@Model.Product.Description</td>
+                        <td>@Model.Product.Price</td>
+                        <td>@Model.Product.Count</td>
+                        <td>
+                            @if (Model.Product.IsAvailable)
+                            {
+                                <span class="badge bg-success">Yes</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">No</span>
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+
+</div>
+
