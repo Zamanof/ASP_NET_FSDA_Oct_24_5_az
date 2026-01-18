@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.13.35825.156
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11408.102 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP NET 01. Web App example", "ASP NET 01. Web App example\ASP NET 01. Web App example.csproj", "{1FFED43F-A859-476C-AE20-683CAEB5E315}"
 EndProject
@@ -40,6 +40,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP NET 05. ASP Filters", "ASP NET 05. ASP Filters\ASP NET 05. ASP Filters.csproj", "{5955DACF-9E42-46F4-9CF3-491A6B749BF3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP NET 05. Html Helpers", "ASP NET 05. Html Helpers\ASP NET 05. Html Helpers.csproj", "{5033BF83-1D50-4804-A5E8-87EDBFAC56E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASP NET 06", "ASP NET 06", "{E2904AD3-F48F-427D-BE9D-F7D316FA2ED9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP NET 06. Pagination Filtering Ordering", "ASP NET 06. Pagination Filtering Ordering\ASP NET 06. Pagination Filtering Ordering.csproj", "{88FCC0D6-4D17-4A98-8C72-92B70B6BFF10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -103,6 +107,10 @@ Global
 		{5033BF83-1D50-4804-A5E8-87EDBFAC56E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5033BF83-1D50-4804-A5E8-87EDBFAC56E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5033BF83-1D50-4804-A5E8-87EDBFAC56E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88FCC0D6-4D17-4A98-8C72-92B70B6BFF10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88FCC0D6-4D17-4A98-8C72-92B70B6BFF10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88FCC0D6-4D17-4A98-8C72-92B70B6BFF10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88FCC0D6-4D17-4A98-8C72-92B70B6BFF10}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -122,6 +130,7 @@ Global
 		{52AD513F-2BE1-4585-8FE4-78FDC885C274} = {67FC2835-00FF-4049-A8AB-6090C068DB4E}
 		{5955DACF-9E42-46F4-9CF3-491A6B749BF3} = {21EC08E1-4950-4C76-B88F-C33E4B6E3654}
 		{5033BF83-1D50-4804-A5E8-87EDBFAC56E8} = {21EC08E1-4950-4C76-B88F-C33E4B6E3654}
+		{88FCC0D6-4D17-4A98-8C72-92B70B6BFF10} = {E2904AD3-F48F-427D-BE9D-F7D316FA2ED9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09C8E7E1-5533-4AA5-B27C-16B8F3B3A9D8}
