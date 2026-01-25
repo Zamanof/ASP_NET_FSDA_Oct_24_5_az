@@ -1,0 +1,6 @@
+@ASP_NET_09._TaskFlow_Swagger_documentation_HostAddress = http://localhost:5035
+
+GET {{ASP_NET_09._TaskFlow_Swagger_documentation_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
