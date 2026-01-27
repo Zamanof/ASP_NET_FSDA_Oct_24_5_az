@@ -30,9 +30,16 @@ public class ProjectSevice : IProjectService
         return project;
     }
 
-    public Task<bool> DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        var project = await _context.Projects.FindAsync(id);
+
+        if (project is null) return false;
+
+        _context.Projects.Remove(project);
+        await _context.SaveChangesAsync();
+
+        return true;
     }
 
     public async Task<IEnumerable<Project>> GetAllAsync()
@@ -51,8 +58,21 @@ public class ProjectSevice : IProjectService
             .FirstOrDefaultAsync(p=> p.Id == id);
     }
 
-    public Task<Project?> UpdateAsync(int id, Project project)
+    public async Task<Project?> UpdateAsync(int id, Project project)
     {
-        throw new NotImplementedException();
+        var updatedProject = await _context
+                                    .Projects
+                                    .Include(p => p.Tasks)
+                                    .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (updatedProject is null) return null;
+
+        updatedProject.Name = project.Name;
+        updatedProject.Description = project.Description;
+        updatedProject.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return updatedProject;
     }
 }

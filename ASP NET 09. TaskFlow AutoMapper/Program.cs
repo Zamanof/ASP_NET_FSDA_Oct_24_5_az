@@ -1,6 +1,7 @@
-using ASP_NET_07._TaskFlow_introduction.Data;
-using ASP_NET_07._TaskFlow_introduction.Services;
-using ASP_NET_07._TaskFlow_introduction.Services.Interfaces;
+using ASP_NET_09._TaskFlow_AutoMapper.Data;
+using ASP_NET_09._TaskFlow_AutoMapper.Mapping;
+using ASP_NET_09._TaskFlow_AutoMapper.Services;
+using ASP_NET_09._TaskFlow_AutoMapper.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<TaskFlowDBContext>(
     options => options.UseSqlServer(connectionString)
     );
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddScoped<IProjectService, ProjectSevice>();
 builder.Services.AddScoped<ITaskItemService, TaskItemService>();

@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace ASP_NET_07._TaskFlow_introduction.Models;
+﻿namespace ASP_NET_09._TaskFlow_AutoMapper.Models;
 
 public class TaskItem
 {
@@ -15,13 +13,5 @@ public class TaskItem
     public int ProjectId { get; set; }
 
     // navigation property
-    [JsonIgnore]
     public Project Project { get; set; } = null!;
-}
-
-public enum TaskStatus
-{
-    ToDo,
-    InProgress,
-    Done
 }

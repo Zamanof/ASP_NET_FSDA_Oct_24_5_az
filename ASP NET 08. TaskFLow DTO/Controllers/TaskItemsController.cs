@@ -1,8 +1,9 @@
-﻿using ASP_NET_07._TaskFlow_introduction.Models;
-using ASP_NET_07._TaskFlow_introduction.Services.Interfaces;
+﻿using ASP_NET_08._TaskFLow_DTO.Models;
+using ASP_NET_08._TaskFLow_DTO.Services.Interfaces;
+using ASP_NET_08._TaskFLow_DTO.DTOs.TaskItem_DTOs;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ASP_NET_07._TaskFlow_introduction.Controllers;
+namespace ASP_NET_08._TaskFLow_DTO.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -16,13 +17,13 @@ public class TaskItemsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<TaskItem>> Create([FromBody] TaskItem taskItem)
+    public async Task<ActionResult<TaskItemResponseDto>> Create([FromBody] CreateTaskItemDto createTaskItem)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
         try
         {
-            var createdTaskItem = await _taskItemService.CreateAsync(taskItem);
+            var createdTaskItem = await _taskItemService.CreateAsync(createTaskItem);
 
             return CreatedAtAction(
                                     nameof(GetById), 
@@ -38,7 +39,7 @@ public class TaskItemsController : ControllerBase
 
     [HttpGet]
     // http://localhost:5012/api/Projects
-    public async Task<ActionResult<IEnumerable<TaskItem>>> GetAll()
+    public async Task<ActionResult<IEnumerable<TaskItemResponseDto>>> GetAll()
     {
         var taskItems = await _taskItemService.GetAllAsync();
         return Ok(taskItems);
@@ -46,7 +47,7 @@ public class TaskItemsController : ControllerBase
 
     [HttpGet("{id}")]
     // http://localhost:5012/api/Projects/1
-    public async Task<ActionResult<TaskItem>> GetById(int id)
+    public async Task<ActionResult<TaskItemResponseDto>> GetById(int id)
     {
         var taskItem = await _taskItemService.GetByIdAsync(id);
         if (taskItem is null)
@@ -56,7 +57,7 @@ public class TaskItemsController : ControllerBase
     }
     [HttpGet("project/{projectId}")]
     // http://localhost:5012/api/Projects/project/1
-    public async Task<ActionResult<IEnumerable<TaskItem>>> GetByProjectId(int projectId)
+    public async Task<ActionResult<IEnumerable<TaskItemResponseDto>>> GetByProjectId(int projectId)
     {
         var taskItems = await _taskItemService.GetByProjectIdAsync(projectId);
         return Ok(taskItems);
@@ -64,12 +65,12 @@ public class TaskItemsController : ControllerBase
 
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<TaskItem>> Update(int id, [FromBody] TaskItem TaskItem)
+    public async Task<ActionResult<TaskItemResponseDto>> Update(int id, [FromBody] UpdateTaskItemDto updateTaskItem)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var updatedTaskItem = await _taskItemService.UpdateAsync(id, TaskItem);
+        var updatedTaskItem = await _taskItemService.UpdateAsync(id, updateTaskItem);
 
         if (updatedTaskItem is null)
             return NotFound($"TaskItem with ID {id} not found");

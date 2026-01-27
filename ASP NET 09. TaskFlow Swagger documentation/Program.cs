@@ -3,7 +3,6 @@ using ASP_NET_09._TaskFlow_Swagger_documentation.Mapping;
 using ASP_NET_09._TaskFlow_Swagger_documentation.Services;
 using ASP_NET_09._TaskFlow_Swagger_documentation.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 
@@ -61,7 +60,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(
+        options =>
+        {
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "TaskFlow API v1");
+            options.RoutePrefix = string.Empty;
+        }
+        );
     app.MapOpenApi();
 
 }
