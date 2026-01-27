@@ -59,6 +59,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP NET 09. TaskFlow AutoMa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP NET 09. TaskFlow Swagger documentation", "ASP NET 09. TaskFlow Swagger documentation\ASP NET 09. TaskFlow Swagger documentation.csproj", "{97764CAD-44A0-47FF-9994-3B91DD39B8BE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASP NET 10", "ASP NET 10", "{FB38E4E9-22AA-4335-A0A5-3E98C5A94ED6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP NET 10. TaskFlow Pagination Filtering Ordering", "ASP NET 10. TaskFlow Pagination Filtering Ordering\ASP NET 10. TaskFlow Pagination Filtering Ordering.csproj", "{1CB9D9AE-0861-481E-9418-A2B02C578C6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -141,6 +145,10 @@ Global
 		{97764CAD-44A0-47FF-9994-3B91DD39B8BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97764CAD-44A0-47FF-9994-3B91DD39B8BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97764CAD-44A0-47FF-9994-3B91DD39B8BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CB9D9AE-0861-481E-9418-A2B02C578C6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CB9D9AE-0861-481E-9418-A2B02C578C6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CB9D9AE-0861-481E-9418-A2B02C578C6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CB9D9AE-0861-481E-9418-A2B02C578C6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -165,6 +173,7 @@ Global
 		{13399F04-3090-4D98-AD72-09FA01C6ED42} = {1FC846CD-DD5F-4371-883B-DEC9922FF0E3}
 		{D26ECCC4-045F-412B-B242-BF2187F359C0} = {D30F2BFC-5C3C-44E5-ACE6-89A33DF6BE6C}
 		{97764CAD-44A0-47FF-9994-3B91DD39B8BE} = {D30F2BFC-5C3C-44E5-ACE6-89A33DF6BE6C}
+		{1CB9D9AE-0861-481E-9418-A2B02C578C6A} = {FB38E4E9-22AA-4335-A0A5-3E98C5A94ED6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09C8E7E1-5533-4AA5-B27C-16B8F3B3A9D8}

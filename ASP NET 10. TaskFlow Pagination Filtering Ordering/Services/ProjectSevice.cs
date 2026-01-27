@@ -1,0 +1,84 @@
+﻿using ASP_NET_10._TaskFlow_Pagination_Filtering_Ordering.Data;
+using ASP_NET_10._TaskFlow_Pagination_Filtering_Ordering.Models;
+using ASP_NET_10._TaskFlow_Pagination_Filtering_Ordering.Services.Interfaces;
+using ASP_NET_10._TaskFlow_Pagination_Filtering_Ordering.DTOs.Project_DTOs;
+using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+
+namespace ASP_NET_10._TaskFlow_Pagination_Filtering_Ordering.Services;
+
+public class ProjectSevice : IProjectService
+{
+    private readonly TaskFlowDBContext _context;
+    private readonly IMapper _mapper;
+
+    public ProjectSevice(TaskFlowDBContext context, IMapper mapper)
+    {
+        _context = context;
+        _mapper = mapper;
+    }
+
+    public async Task<ProjectResponseDto> CreateAsync(CreateProjectDto createProjectDto)
+    {
+        var project = _mapper.Map<Project>(createProjectDto);
+        
+
+        _context.Projects.Add(project);
+        await _context.SaveChangesAsync();
+
+        await _context
+            .Entry(project)
+            .Collection(p => p.Tasks)
+            .LoadAsync();
+
+        return _mapper.Map< ProjectResponseDto>(project);
+    }
+
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var project = await _context.Projects.FindAsync(id);
+
+        if (project is null) return false;
+
+        _context.Projects.Remove(project);
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<IEnumerable<ProjectResponseDto>> GetAllAsync()
+    {
+        var projects = await _context
+            .Projects
+            .Include(p => p.Tasks)
+            .ToListAsync();
+        return _mapper.Map<IEnumerable<ProjectResponseDto>>(projects);
+    }
+
+    public async Task<ProjectResponseDto?> GetByIdAsync(int id)
+    {
+        var project = await _context
+            .Projects
+            .Include(p => p.Tasks)
+            .FirstOrDefaultAsync(p => p.Id == id);
+        
+        return _mapper.Map<ProjectResponseDto>(project);
+    }
+
+    public async Task<ProjectResponseDto?> UpdateAsync(int id, UpdateProjectDto  updateProjectDto)
+    {
+        var updatedProject = await _context
+                                    .Projects
+                                    .Include(p => p.Tasks)
+                                    .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (updatedProject is null) return null;
+
+        _mapper.Map(updateProjectDto, updatedProject);
+
+        await _context.SaveChangesAsync();
+        
+        return _mapper.Map<ProjectResponseDto>(updatedProject);
+    }
+
+}
