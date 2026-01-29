@@ -63,6 +63,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASP NET 10", "ASP NET 10", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP NET 10. TaskFlow Pagination Filtering Ordering", "ASP NET 10. TaskFlow Pagination Filtering Ordering\ASP NET 10. TaskFlow Pagination Filtering Ordering.csproj", "{1CB9D9AE-0861-481E-9418-A2B02C578C6A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASP NET 11", "ASP NET 11", "{185018D0-7E14-4A9C-A4A7-EB7BDCEB391F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP NET 11. Validation", "ASP NET 11. Validation\ASP NET 11. Validation.csproj", "{495ED3EF-3415-4DDB-B42F-6947F4057C1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -149,6 +153,10 @@ Global
 		{1CB9D9AE-0861-481E-9418-A2B02C578C6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CB9D9AE-0861-481E-9418-A2B02C578C6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CB9D9AE-0861-481E-9418-A2B02C578C6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{495ED3EF-3415-4DDB-B42F-6947F4057C1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{495ED3EF-3415-4DDB-B42F-6947F4057C1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{495ED3EF-3415-4DDB-B42F-6947F4057C1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{495ED3EF-3415-4DDB-B42F-6947F4057C1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -174,6 +182,7 @@ Global
 		{D26ECCC4-045F-412B-B242-BF2187F359C0} = {D30F2BFC-5C3C-44E5-ACE6-89A33DF6BE6C}
 		{97764CAD-44A0-47FF-9994-3B91DD39B8BE} = {D30F2BFC-5C3C-44E5-ACE6-89A33DF6BE6C}
 		{1CB9D9AE-0861-481E-9418-A2B02C578C6A} = {FB38E4E9-22AA-4335-A0A5-3E98C5A94ED6}
+		{495ED3EF-3415-4DDB-B42F-6947F4057C1D} = {185018D0-7E14-4A9C-A4A7-EB7BDCEB391F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09C8E7E1-5533-4AA5-B27C-16B8F3B3A9D8}

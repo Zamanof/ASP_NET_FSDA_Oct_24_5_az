@@ -1,8 +1,12 @@
-using ASP_NET_10._TaskFlow_Pagination_Filtering_Ordering.Data;
-using ASP_NET_10._TaskFlow_Pagination_Filtering_Ordering.Mapping;
-using ASP_NET_10._TaskFlow_Pagination_Filtering_Ordering.Services;
-using ASP_NET_10._TaskFlow_Pagination_Filtering_Ordering.Services.Interfaces;
+using ASP_NET_11._Validation.Data;
+using ASP_NET_11._Validation.DTOs.Project_DTOs;
+using ASP_NET_11._Validation.Mapping;
+using ASP_NET_11._Validation.Middlewares;
+using ASP_NET_11._Validation.Services;
+using ASP_NET_11._Validation.Services.Interfaces;
+using ASP_NET_11._Validation.Validators;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
@@ -44,6 +48,7 @@ builder.Services.AddSwaggerGen(
 
     );
 
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
 builder.Services.AddDbContext<TaskFlowDBContext>(
     options => options.UseSqlServer(connectionString)
@@ -53,6 +58,13 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddScoped<IProjectService, ProjectSevice>();
 builder.Services.AddScoped<ITaskItemService, TaskItemService>();
+
+//builder.Services.AddScoped<IValidator<CreateProjectDto>, CreateProjectValidator>();
+//builder.Services.AddScoped<IValidator<UpdateProjectDto>, UpdateProjectValidator>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+builder.Services.AddFluentValidationAutoValidation();
 
 var app = builder.Build();
 
@@ -73,6 +85,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 
 }
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseAuthorization();
 

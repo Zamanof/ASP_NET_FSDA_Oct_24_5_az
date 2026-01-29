@@ -1,11 +1,11 @@
-﻿using ASP_NET_10._TaskFlow_Pagination_Filtering_Ordering.Models;
-using ASP_NET_10._TaskFlow_Pagination_Filtering_Ordering.Services.Interfaces;
-using ASP_NET_10._TaskFlow_Pagination_Filtering_Ordering.DTOs.TaskItem_DTOs;
+﻿using ASP_NET_11._Validation.Models;
+using ASP_NET_11._Validation.Services.Interfaces;
+using ASP_NET_11._Validation.DTOs.TaskItem_DTOs;
 using Microsoft.AspNetCore.Mvc;
-using ASP_NET_10._TaskFlow_Pagination_Filtering_Ordering.Common;
-using ASP_NET_10._TaskFlow_Pagination_Filtering_Ordering.DTOs;
+using ASP_NET_11._Validation.Common;
+using ASP_NET_11._Validation.DTOs;
 
-namespace ASP_NET_10._TaskFlow_Pagination_Filtering_Ordering.Controllers;
+namespace ASP_NET_11._Validation.Controllers;
 
 /// <summary>
 /// Controller for managing task items.
