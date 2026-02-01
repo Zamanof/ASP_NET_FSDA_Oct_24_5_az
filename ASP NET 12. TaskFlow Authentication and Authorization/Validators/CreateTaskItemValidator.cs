@@ -1,8 +1,8 @@
-﻿using ASP_NET_11._Validation.DTOs.TaskItem_DTOs;
-using ASP_NET_11._Validation.Models;
+﻿using ASP_NET_12._TaskFlow_Authentication_and_Authorization.DTOs.TaskItem_DTOs;
+using ASP_NET_12._TaskFlow_Authentication_and_Authorization.Models;
 using FluentValidation;
 
-namespace ASP_NET_11._Validation.Validators;
+namespace ASP_NET_12._TaskFlow_Authentication_and_Authorization.Validators;
 
 public class CreateTaskItemValidator : AbstractValidator<CreateTaskItemDto>
 {

@@ -1,0 +1,6 @@
+@ASP_NET_12._TaskFlow_Authentication_and_Authorization_HostAddress = http://localhost:5016
+
+GET {{ASP_NET_12._TaskFlow_Authentication_and_Authorization_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
