@@ -40,7 +40,7 @@ public class AuthService : IAuthService
         {
             throw new UnauthorizedAccessException("Invalid email or password.");
         }
-        return await GenerateToken(user);
+        return await GenerateTokenAsync(user);
     }
 
     public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto registerRequest)
@@ -71,10 +71,10 @@ public class AuthService : IAuthService
             throw new InvalidOperationException($"User creation failed: {errors}");
         }
 
-        return await GenerateToken(user);
+        return await GenerateTokenAsync(user);
     }
 
-    private async Task<AuthResponseDto> GenerateToken(ApplicationUser user)
+    private async Task<AuthResponseDto> GenerateTokenAsync(ApplicationUser user)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
         var secretKey = jwtSettings["SecretKey"];
@@ -85,37 +85,41 @@ public class AuthService : IAuthService
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+        // Получаем роли пользователя
         var roles = await _userManager.GetRolesAsync(user);
 
+        // Создаём claims
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Name, user.UserName!),
-            new Claim(ClaimTypes.Email, user.Email!),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
-            //new Claim(ClaimTypes.Role, string.Join(",", roles))
+            new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
+            new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
+        // Добавляем роли в claims
         foreach (var role in roles)
         {
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
+        // Создаём токен
         var token = new JwtSecurityToken(
             issuer: issuer,
             audience: audience,
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(expirationMinutes),
             signingCredentials: credentials
-            );
+        );
+
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
         return new AuthResponseDto
         {
             AccessToken = tokenString,
             ExpiresAt = DateTime.UtcNow.AddMinutes(expirationMinutes),
-            Email = user.Email!,
+            Email = user.Email ?? string.Empty,
             Roles = roles
-        };     
+        };
     }
 }

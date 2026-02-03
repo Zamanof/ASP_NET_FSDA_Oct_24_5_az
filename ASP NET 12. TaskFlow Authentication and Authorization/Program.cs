@@ -71,7 +71,7 @@ builder.Services.AddSwaggerGen(
                             Reference = new OpenApiReference
                             {
                                 Type = ReferenceType.SecurityScheme,
-                                Id="Beraer"
+                                Id="Bearer"
                             }
                         },
                         Array.Empty<string>()
