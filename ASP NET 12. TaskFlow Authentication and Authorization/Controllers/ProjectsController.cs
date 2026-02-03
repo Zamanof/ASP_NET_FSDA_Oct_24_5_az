@@ -11,6 +11,7 @@ namespace ASP_NET_12._TaskFlow_Authentication_and_Authorization.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class ProjectsController : ControllerBase
 {
     private readonly IProjectService _projectService;
@@ -36,7 +37,7 @@ public class ProjectsController : ControllerBase
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
-        throw new KeyNotFoundException();
+        //throw new KeyNotFoundException();
         var createdProject = await _projectService.CreateAsync(createProjectDto);
 
         return CreatedAtAction(nameof(GetById), new { id = createdProject.Id },

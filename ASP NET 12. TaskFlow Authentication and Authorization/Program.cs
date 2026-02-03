@@ -6,10 +6,13 @@ using ASP_NET_12._TaskFlow_Authentication_and_Authorization.Services;
 using ASP_NET_12._TaskFlow_Authentication_and_Authorization.Services.Interfaces;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +22,8 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen(
-        options => {
+        options =>
+        {
             options.SwaggerDoc("v1",
             new OpenApiInfo
             {
@@ -44,9 +48,36 @@ builder.Services.AddSwaggerGen(
             {
                 options.IncludeXmlComments(xmlPath);
             }
-        }
 
-    );
+            // JWT options for Swaggeer
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = """
+                JWT Suthorization header using the Bearer scheme. 
+                Example: Authorization: Bearer {token}
+                """,
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+
+            options.AddSecurityRequirement(
+                new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id="Beraer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+        });
 
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
@@ -55,9 +86,53 @@ builder.Services.AddDbContext<TaskFlowDBContext>(
     );
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(
-    
-).AddEntityFrameworkStores<TaskFlowDBContext>();
+    options =>
+    {
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredLength = 6;
 
+        options.User.RequireUniqueEmail = true;
+        options.SignIn.RequireConfirmedEmail = false;
+    }
+
+)
+    .AddEntityFrameworkStores<TaskFlowDBContext>()
+    .AddDefaultTokenProviders();
+
+// JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var secretKey = jwtSettings["SecretKey"];
+var issuer = jwtSettings["Issuer"];
+var audience = jwtSettings["Audience"];
+
+builder.Services.AddAuthentication(
+    options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    }
+    )
+    .AddJwtBearer(
+        options=>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience =true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = issuer,
+                ValidAudience = audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
+                ClockSkew = TimeSpan.Zero
+            };
+        }
+    );
+
+builder.Services.AddAuthorization();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // Services
@@ -95,6 +170,7 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();
