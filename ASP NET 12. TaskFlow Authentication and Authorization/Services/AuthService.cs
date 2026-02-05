@@ -71,6 +71,8 @@ public class AuthService : IAuthService
             throw new InvalidOperationException($"User creation failed: {errors}");
         }
 
+        await _userManager.AddToRoleAsync(user, "User");
+
         return await GenerateTokenAsync(user);
     }
 
@@ -85,10 +87,10 @@ public class AuthService : IAuthService
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        // Получаем роли пользователя
+
         var roles = await _userManager.GetRolesAsync(user);
 
-        // Создаём claims
+
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id),
@@ -97,13 +99,12 @@ public class AuthService : IAuthService
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        // Добавляем роли в claims
+
         foreach (var role in roles)
         {
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
-        // Создаём токен
         var token = new JwtSecurityToken(
             issuer: issuer,
             audience: audience,

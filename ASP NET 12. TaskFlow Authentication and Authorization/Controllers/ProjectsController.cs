@@ -11,7 +11,6 @@ namespace ASP_NET_12._TaskFlow_Authentication_and_Authorization.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
 public class ProjectsController : ControllerBase
 {
     private readonly IProjectService _projectService;
@@ -33,6 +32,8 @@ public class ProjectsController : ControllerBase
     /// <response code="201">The project was successfully created.</response>
     /// <response code="400">The request body is invalid.</response>
     [HttpPost]
+    //[Authorize(Roles ="Admin, Manager")]
+    [Authorize(Policy ="AdminOrManager")]
     public async Task<ActionResult<ApiResponse<ProjectResponseDto>>> Create([FromBody] CreateProjectDto createProjectDto)
     {
         if (!ModelState.IsValid)
@@ -52,6 +53,8 @@ public class ProjectsController : ControllerBase
     /// <response code="200">The project was found and returned.</response>
     /// <response code="404">A project with the specified identifier was not found.</response>
     [HttpGet("{id}")]
+    //[Authorize(Roles = "Admin, Manager, User")]
+    [Authorize(Policy = "UserOrAbove")]
     public async Task<ActionResult<ApiResponse<ProjectResponseDto>>> GetById(int id)
     {
         var project = await _projectService.GetByIdAsync(id);
@@ -67,6 +70,8 @@ public class ProjectsController : ControllerBase
     /// <returns>A list of all projects wrapped in <see cref="ApiResponse{IEnumerable{ProjectResponseDto}}"/>.</returns>
     /// <response code="200">Returns the list of projects.</response>
     [HttpGet]
+    //[Authorize(Roles = "Admin, Manager, User")]
+    [Authorize(Policy = "UserOrAbove")]
     public async Task<ActionResult<ApiResponse<IEnumerable<ProjectResponseDto>>>> GetAll()
     {
         var projects = await _projectService.GetAllAsync();
@@ -83,6 +88,8 @@ public class ProjectsController : ControllerBase
     /// <response code="400">The request body is invalid.</response>
     /// <response code="404">A project with the specified identifier was not found.</response>
     [HttpPut("{id}")]
+    //[Authorize(Roles = "Admin, Manager")]
+    [Authorize(Policy = "AdminOrManager")]
     public async Task<ActionResult<ApiResponse<ProjectResponseDto>>> Update(int id, [FromBody] UpdateProjectDto updateProjectDto)
     {
         if (!ModelState.IsValid)
@@ -104,6 +111,8 @@ public class ProjectsController : ControllerBase
     /// <response code="200">The project was successfully deleted.</response>
     /// <response code="404">A project with the specified identifier was not found.</response>
     [HttpDelete("{id}")]
+    //[Authorize(Roles = "Admin")]
+    [Authorize(Policy = "AdminOnly")]
     public async Task<ActionResult<ApiResponse<object>>> Delete(int id)
     {
         var isDeleted = await _projectService.DeleteAsync(id);
@@ -114,3 +123,15 @@ public class ProjectsController : ControllerBase
         return Ok(ApiResponse<object>.SuccessResponse(null!, "Project deleted successfully"));
     }
 }
+
+
+// CanCreate
+// CanRead
+// CanUpdate
+// CanDelete
+// CanTest
+// CanFilan
+// CanBesmeken
+// CanOther
+// CanSome
+// CanAny
