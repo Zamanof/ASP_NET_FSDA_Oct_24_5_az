@@ -361,3 +361,56 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+############################
+# React / Node.js
+############################
+
+# Dependencies
+node_modules/
+
+# Production build
+build/
+dist/
+
+# Vite
+.vite/
+
+# Next.js
+.next/
+out/
+
+# CRA
+/build
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Package manager
+.pnpm-store/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor configs
+.vscode/
+!.vscode/extensions.json
+.idea/
+
+# Cache
+.eslintcache

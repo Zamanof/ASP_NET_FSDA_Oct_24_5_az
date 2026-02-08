@@ -9,7 +9,7 @@ public class AuthResponseDto
     /// <summary>
     /// Token Expires date 
     /// </summary>
-    public DateTime ExpiresAt { get; set; }
+    public DateTimeOffset ExpiresAt { get; set; }
     /// <summary>
     /// Refresh token
     /// </summary>
@@ -17,7 +17,7 @@ public class AuthResponseDto
     /// <summary>
     /// Token Expires date 
     /// </summary>
-    public DateTime RefreshTokenExpiresAt { get; set; }
+    public DateTimeOffset RefreshTokenExpiresAt { get; set; }
 
     /// <summary>
     /// User Email
