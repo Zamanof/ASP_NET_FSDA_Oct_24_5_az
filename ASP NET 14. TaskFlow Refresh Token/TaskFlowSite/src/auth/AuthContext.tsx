@@ -26,7 +26,7 @@ interface AuthContextValue {
     lastName: string;
     email: string;
     password: string;
-    confirmPassword: string;
+    confirmedPassword: string;
   }) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
 }
@@ -108,7 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       lastName: string;
       email: string;
       password: string;
-      confirmPassword: string;
+      confirmedPassword: string;
     }) => {
       const result = await authApi.register(payload);
       if (result.success && result.data) {
