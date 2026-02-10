@@ -26,5 +26,5 @@ public class RegisterRequestDto
     /// Confirmed Password
     /// </summary>
     /// <example>P@ssword123!</example>
-    public string ConfirmedPassword { get; set; } = string.Empty;
+    public string ConfirmPassword { get; set; } = string.Empty;
 }

@@ -48,6 +48,6 @@ public class AuthController : ControllerBase
         [FromBody] RefreshTokenRequest refreshTokenRequest)
     {
         await _authService.RevokeRefreshTokenAsync(refreshTokenRequest);
-        return Ok(ApiResponse<object>.SuccessResponse("Token refresh successfully"));
+        return Ok(ApiResponse<object>.SuccessResponse("Token revoke successfully"));
     }
 }
