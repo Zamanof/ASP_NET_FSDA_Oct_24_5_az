@@ -13,6 +13,7 @@ public class TaskFlowDBContext : IdentityDbContext<ApplicationUser>
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<TaskItem> TaskItems => Set<TaskItem>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<ProjectMember> ProjectMembers => Set<ProjectMember>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -31,6 +32,13 @@ public class TaskFlowDBContext : IdentityDbContext<ApplicationUser>
                     .HasMaxLength(1000);
                 entity.Property(p => p.CreatedAt)
                     .IsRequired();
+                entity.Property(p => p.OwnerId)
+                     .IsRequired()
+                     .HasMaxLength(450);
+                entity.HasOne(p => p.Owner)
+                      .WithMany()
+                      .HasForeignKey(p => p.OwnerId)
+                      .OnDelete(DeleteBehavior.Restrict);
             }
             );
 
@@ -80,6 +88,23 @@ public class TaskFlowDBContext : IdentityDbContext<ApplicationUser>
                     .Property(e => e.UserId)
                     .IsRequired()
                     .HasMaxLength(450);
+            }
+            );
+
+        // ProjectMember
+        modelBuilder.Entity<ProjectMember>(
+            entity =>
+            {
+                entity.HasKey(e => new { e.ProjectId, e.UserId });
+                entity.HasOne(e => e.Project)
+                    .WithMany(p => p.Members)
+                    .HasForeignKey(e => e.ProjectId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.ProjectMemberships)
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                entity.Property(e => e.UserId).HasMaxLength(450);
             }
             );
     }

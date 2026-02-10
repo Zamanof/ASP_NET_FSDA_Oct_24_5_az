@@ -1,3 +1,4 @@
+using ASP_NET_16._TaskFlow_with_ownership.Authorization;
 using ASP_NET_16._TaskFlow_with_ownership.Data;
 using ASP_NET_16._TaskFlow_with_ownership.Mapping;
 using ASP_NET_16._TaskFlow_with_ownership.Middlewares;
@@ -7,6 +8,7 @@ using ASP_NET_16._TaskFlow_with_ownership.Services.Interfaces;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -136,11 +138,30 @@ builder.Services.AddAuthentication(
 builder.Services.AddAuthorization(
     options=>
     {
-        options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-        options.AddPolicy("AdminOrManager", policy => policy.RequireRole("Admin", "Manager"));
-        options.AddPolicy("UserOrAbove", policy => policy.RequireRole("Admin", "Manager", "User"));
+        options
+        .AddPolicy(
+            "AdminOnly", 
+            policy => 
+                policy.RequireRole("Admin"));
+        options
+        .AddPolicy(
+            "AdminOrManager", 
+            policy => 
+                policy.RequireRole("Admin", "Manager"));
+        options
+        .AddPolicy(
+            "UserOrAbove", 
+            policy => 
+                policy.RequireRole("Admin", "Manager", "User"));
+        options
+         .AddPolicy(
+            "ProjectOwnerOrAdmin", 
+            policy => 
+                policy.Requirements.Add(new ProjectOwnerOrAdminRequirment()));
     }
     );
+
+builder.Services.AddScoped<IAuthorizationHandler, ProjectOwnerOrAdminHandler>();
 
 builder.Services.AddCors(
     options =>
