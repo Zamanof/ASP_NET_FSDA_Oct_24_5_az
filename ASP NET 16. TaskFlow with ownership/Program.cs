@@ -158,10 +158,22 @@ builder.Services.AddAuthorization(
             "ProjectOwnerOrAdmin", 
             policy => 
                 policy.Requirements.Add(new ProjectOwnerOrAdminRequirment()));
+        options
+         .AddPolicy(
+            "ProjectMemberOrHigher",
+            policy =>
+                policy.Requirements.Add(new ProjectMemberOrHigherRequirment()));
+        options
+         .AddPolicy(
+            "TaskStatusChange",
+            policy =>
+                policy.Requirements.Add(new TaskStatusChangeRequirment()));
     }
     );
 
 builder.Services.AddScoped<IAuthorizationHandler, ProjectOwnerOrAdminHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ProjectMemberOrHigherHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, TaskStatusChangeHandler>();
 
 builder.Services.AddCors(
     options =>
