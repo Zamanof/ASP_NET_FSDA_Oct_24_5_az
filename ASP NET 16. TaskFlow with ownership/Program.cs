@@ -222,6 +222,7 @@ if (app.Environment.IsDevelopment())
             options.EnableFilter();
             options.EnableTryItOutByDefault();
             options.DisplayRequestDuration();
+            options.EnablePersistAuthorization();
         }
         );
     app.MapOpenApi();

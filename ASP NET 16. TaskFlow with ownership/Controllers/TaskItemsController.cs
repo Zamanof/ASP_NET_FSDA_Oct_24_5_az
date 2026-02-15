@@ -4,6 +4,7 @@ using ASP_NET_16._TaskFlow_with_ownership.DTOs.TaskItem_DTOs;
 using Microsoft.AspNetCore.Mvc;
 using ASP_NET_16._TaskFlow_with_ownership.Common;
 using ASP_NET_16._TaskFlow_with_ownership.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ASP_NET_16._TaskFlow_with_ownership.Controllers;
 
@@ -12,17 +13,22 @@ namespace ASP_NET_16._TaskFlow_with_ownership.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Policy ="UserOrAbove")]
 public class TaskItemsController : ControllerBase
 {
     private readonly ITaskItemService _taskItemService;
+    private readonly IProjectService _projectService;
+    private readonly IAuthorizationService _authorizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TaskItemsController"/> class.
     /// </summary>
     /// <param name="taskItemService">Service for task item operations.</param>
-    public TaskItemsController(ITaskItemService taskItemService)
+    public TaskItemsController(ITaskItemService taskItemService, IProjectService projectService, IAuthorizationService authorizationService)
     {
         _taskItemService = taskItemService;
+        _projectService = projectService;
+        _authorizationService = authorizationService;
     }
 
     /// <summary>
@@ -43,6 +49,17 @@ public class TaskItemsController : ControllerBase
                 Message = "Invalid model state",
                 Data = default
             });
+
+        var project = await _projectService.GetProjectEntityAsync(createTaskItem.ProjectId);
+
+        if (project == null)
+            return NotFound();
+
+        var authResult = await _authorizationService
+                                .AuthorizeAsync(User, project, "ProjectOwnerOrAdmin");
+
+        if (!authResult.Succeeded)
+            return Forbid();
 
         try
         {
@@ -89,6 +106,22 @@ public class TaskItemsController : ControllerBase
     //[Tags("get by id")]
     public async Task<ActionResult<ApiResponse<TaskItemResponseDto>>> GetById(int id)
     {
+        var task =await _taskItemService.GetTaskEntityAsync(id);
+
+        if (task == null)
+            return NotFound();
+
+        var project = await _projectService.GetProjectEntityAsync(task.ProjectId);
+
+        if (project == null)
+            return NotFound();
+
+        var authResult = await _authorizationService
+                                .AuthorizeAsync(User, project, "ProjectMemberOrHigher");
+
+        if (!authResult.Succeeded)
+            return Forbid();
+
         var taskItem = await _taskItemService.GetByIdAsync(id);
         if (taskItem is null)
             return NotFound(new ApiResponse<TaskItemResponseDto>
@@ -108,8 +141,20 @@ public class TaskItemsController : ControllerBase
     /// <returns>A list of task items for the specified project.</returns>
     /// <response code="200">Returns the list of task items for the project.</response>
     [HttpGet("project/{projectId}")]
-    public async Task<ActionResult<ApiResponse<IEnumerable<TaskItemResponseDto>>>> GetByProjectId(int projectId)
+    public async Task<ActionResult<ApiResponse<IEnumerable<TaskItemResponseDto>>>> 
+        GetByProjectId(int projectId)
     {
+        var project = await _projectService.GetProjectEntityAsync(projectId);
+
+        if (project == null)
+            return NotFound();
+
+        var authResult = await _authorizationService
+                                .AuthorizeAsync(User, project, "ProjectMemberOrHigher");
+
+        if (!authResult.Succeeded)
+            return Forbid();
+
         var taskItems = await _taskItemService.GetByProjectIdAsync(projectId);
         return Ok(ApiResponse<IEnumerable<TaskItemResponseDto>>.SuccessResponse(taskItems));
     }
@@ -134,6 +179,21 @@ public class TaskItemsController : ControllerBase
                 Data = default
             });
 
+        var task = await _taskItemService.GetTaskEntityAsync(id);
+        if (task == null)
+            return NotFound();
+
+        var project = await _projectService.GetProjectEntityAsync(task.ProjectId);
+
+        if (project == null)
+            return NotFound();
+
+        var authResult = await _authorizationService
+                                .AuthorizeAsync(User, project, "ProjectOwnerOrAdmin");
+
+        if (!authResult.Succeeded)
+            return Forbid();
+
         var updatedTaskItem = await _taskItemService.UpdateAsync(id, updateTaskItem);
 
         if (updatedTaskItem is null)
@@ -155,8 +215,23 @@ public class TaskItemsController : ControllerBase
     /// <response code="200">The task item was successfully deleted.</response>
     /// <response code="404">A task item with the specified identifier was not found.</response>
     [HttpDelete("{id}")]
-    public async Task<ActionResult<ApiResponse<object>>> Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
+
+        var task = await _taskItemService.GetTaskEntityAsync(id);
+        if (task == null)
+            return NotFound();
+
+        var project = await _projectService.GetProjectEntityAsync(task.ProjectId);
+
+        if (project == null)
+            return NotFound();
+
+        var authResult = await _authorizationService
+                                .AuthorizeAsync(User, project, "ProjectOwnerOeAdmin");
+
+        if (!authResult.Succeeded)
+            return Forbid();
         var isDeleted = await _taskItemService.DeleteAsync(id);
 
         if (!isDeleted)
@@ -167,19 +242,56 @@ public class TaskItemsController : ControllerBase
                 Data = default
             });
 
-        return Ok(ApiResponse<object>.SuccessResponse(null, "Task item deleted successfully"));
+        return NoContent();
     }
 
-        /// <summary>
-        /// Retrieves a paged, filtered, and sorted list of task items.
-        /// </summary>
-        /// <param name="queryParams">
-        /// Query parameters for pagination, filtering, searching, and sorting task items.
-        /// </param>
-        /// <returns>
-        /// A paged result containing task items that match the specified criteria, wrapped in <see cref="ApiResponse{PagedResult{TaskItemResponseDto}}"/>.
-        /// </returns>
-        /// <response code="200">Returns the paged list of task items.</response>
+
+    [HttpPatch("{id}/status")]
+    public async Task<ActionResult<ApiResponse<TaskItemResponseDto>>> 
+        UpdateStatus(int id, [FromBody] TaskStatusUpdateRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(new ApiResponse<TaskItemResponseDto>
+            {
+                Success = false,
+                Message = "Invalid model state",
+                Data = default
+            });
+
+        var task = await _taskItemService.GetTaskEntityAsync(id);
+        if (task == null)
+            return NotFound();
+
+        var authResult = await _authorizationService
+                                .AuthorizeAsync(User, task, "TaskStatusChange");
+
+        if (!authResult.Succeeded)
+            return Forbid();
+
+        var updatedTaskItem = await _taskItemService.UpdateStatusAsync(id, request);
+
+        if (updatedTaskItem is null)
+            return NotFound(new ApiResponse<TaskItemResponseDto>
+            {
+                Success = false,
+                Message = $"TaskItem with ID {id} not found",
+                Data = default
+            });
+
+        return Ok(ApiResponse<TaskItemResponseDto>.SuccessResponse(updatedTaskItem, "Task item updated successfully"));
+    }
+
+
+    /// <summary>
+    /// Retrieves a paged, filtered, and sorted list of task items.
+    /// </summary>
+    /// <param name="queryParams">
+    /// Query parameters for pagination, filtering, searching, and sorting task items.
+    /// </param>
+    /// <returns>
+    /// A paged result containing task items that match the specified criteria, wrapped in <see cref="ApiResponse{PagedResult{TaskItemResponseDto}}"/>.
+    /// </returns>
+    /// <response code="200">Returns the paged list of task items.</response>
     [HttpGet]
     public async Task<ActionResult<ApiResponse<PagedResult<TaskItemResponseDto>>>> GetPaged(
         [FromQuery] TaskItemQueryParams queryParams)

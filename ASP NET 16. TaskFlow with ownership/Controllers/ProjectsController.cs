@@ -259,15 +259,3 @@ public class ProjectsController : ControllerBase
         return NoContent();
     }
 }
-
-
-// CanCreate
-// CanRead
-// CanUpdate
-// CanDelete
-// CanTest
-// CanFilan
-// CanBesmeken
-// CanOther
-// CanSome
-// CanAny

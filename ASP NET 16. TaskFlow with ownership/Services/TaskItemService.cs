@@ -186,4 +186,31 @@ public class TaskItemService : ITaskItemService
             _ => query.OrderBy(t=> t.CreatedAt)
         };
     }
+
+    public async Task<TaskItemResponseDto?> UpdateStatusAsync(int id, TaskStatusUpdateRequest request)
+    {
+        var task = await _context
+                            .TaskItems
+                            .Include(t => t.Project)
+                            .FirstOrDefaultAsync(t => t.Id == id);
+
+        if (task is null)
+            return null;
+
+        task.Status = request.Status;
+        task.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return _mapper.Map<TaskItemResponseDto?>(task);
+
+    }
+
+    public async Task<TaskItem?> GetTaskEntityAsync(int id)
+    {
+        return await _context
+                            .TaskItems
+                            .Include(t => t.Project)
+                            .FirstOrDefaultAsync(t => t.Id == id);
+    }
 }
