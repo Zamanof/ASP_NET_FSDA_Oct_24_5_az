@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.13.35825.156
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11430.68 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP NET 01. Web App example", "ASP NET 01. Web App example\ASP NET 01. Web App example.csproj", "{1FFED43F-A859-476C-AE20-683CAEB5E315}"
 EndProject
@@ -78,6 +78,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASP NET 15", "ASP NET 15", "{810A5ABE-E887-4C91-8E56-867890CB0BD8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP NET 16. TaskFlow with ownership", "ASP NET 16. TaskFlow with ownership\ASP NET 16. TaskFlow with ownership.csproj", "{0D0CA468-8363-499D-89F2-9FF19FB170DF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASP NET 18", "ASP NET 18", "{03BE8000-3F53-4DC2-B00F-DAB58811FEB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP NET 18. TaskFlow Refactoring", "ASP NET 18. TaskFlow Refactoring\ASP NET 18. TaskFlow Refactoring.csproj", "{587E96DC-1D4E-43B6-9CF6-8318C378D0ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -181,6 +185,10 @@ Global
 		{0D0CA468-8363-499D-89F2-9FF19FB170DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D0CA468-8363-499D-89F2-9FF19FB170DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D0CA468-8363-499D-89F2-9FF19FB170DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{587E96DC-1D4E-43B6-9CF6-8318C378D0ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{587E96DC-1D4E-43B6-9CF6-8318C378D0ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{587E96DC-1D4E-43B6-9CF6-8318C378D0ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{587E96DC-1D4E-43B6-9CF6-8318C378D0ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -210,6 +218,7 @@ Global
 		{D2753301-AFB4-4527-9BB7-6D9E14860B74} = {1D39E270-E0EC-484E-82A8-726590B633C6}
 		{F9FC2C25-7CF4-4D3C-A184-5C38F50BBB20} = {21CCD08F-19AC-4301-A2A3-024545181528}
 		{0D0CA468-8363-499D-89F2-9FF19FB170DF} = {810A5ABE-E887-4C91-8E56-867890CB0BD8}
+		{587E96DC-1D4E-43B6-9CF6-8318C378D0ED} = {03BE8000-3F53-4DC2-B00F-DAB58811FEB6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09C8E7E1-5533-4AA5-B27C-16B8F3B3A9D8}
