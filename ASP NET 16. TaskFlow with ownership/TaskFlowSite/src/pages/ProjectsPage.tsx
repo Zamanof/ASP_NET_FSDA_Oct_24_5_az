@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getProjects, createProject } from '../api/projects';
+import { useAuth } from '../auth/AuthContext';
 import { useToast } from '../context/ToastContext';
 import type { Project } from '../types/api';
 
 const FORBIDDEN_CREATE_PROJECT = 'Creating projects is available only to Managers and Admins.';
 
 export default function ProjectsPage() {
+  const { user } = useAuth();
+  const canCreateProject = (user?.roles?.includes('Manager') || user?.roles?.includes('Admin')) ?? false;
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -48,13 +51,15 @@ export default function ProjectsPage() {
     <>
       <div className="flex justify-between items-center mb-5">
         <h1 className="text-2xl font-semibold text-[#172b4d]">Projects</h1>
-        <button
-          type="button"
-          onClick={() => setShowModal(true)}
-          className="inline-flex items-center justify-center py-2 px-4 rounded font-medium bg-[#0052cc] text-white hover:bg-[#0747a6] transition-colors cursor-pointer"
-        >
-          Create project
-        </button>
+        {canCreateProject && (
+          <button
+            type="button"
+            onClick={() => setShowModal(true)}
+            className="inline-flex items-center justify-center py-2 px-4 rounded font-medium bg-[#0052cc] text-white hover:bg-[#0747a6] transition-colors cursor-pointer"
+          >
+            Create project
+          </button>
+        )}
       </div>
       {loading ? (
         <p className="text-[#5e6c84]">Loading…</p>
@@ -68,7 +73,7 @@ export default function ProjectsPage() {
             >
               <div className="text-base font-semibold mb-2">{p.name}</div>
               <div className="text-[13px] text-[#5e6c84]">
-                {p.tasksCount} {p.tasksCount === 1 ? 'task' : 'tasks'}
+                {p.taskCount} {p.taskCount === 1 ? 'task' : 'tasks'}
                 {p.description && ` · ${p.description.slice(0, 50)}${p.description.length > 50 ? '…' : ''}`}
               </div>
             </Link>

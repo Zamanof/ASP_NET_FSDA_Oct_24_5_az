@@ -1,4 +1,5 @@
-﻿namespace ASP_NET_18._TaskFlow_Refactoring.DTOs.Auth_DTOs;
+﻿namespace ASP_NET_18._TaskFlow_Refactoring.DTOs;
+
 
 public class UserWithRolesDto
 {
@@ -8,4 +9,9 @@ public class UserWithRolesDto
     public string? LastName { get; set; }
     public IList<string> Roles { get; set; } = new List<string>();
 
+}
+
+public class AssignRoleDto
+{
+    public string Role { get; set; } = string.Empty;
 }

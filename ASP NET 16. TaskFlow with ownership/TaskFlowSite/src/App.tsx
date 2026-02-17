@@ -9,6 +9,7 @@ const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const ProjectBoardPage = lazy(() => import('./pages/ProjectBoardPage'));
+const UserManagementPage = lazy(() => import('./pages/UserManagementPage'));
 
 function PageFallback() {
   return (
@@ -37,6 +38,7 @@ export default function App() {
             >
               <Route index element={<ProjectsPage />} />
               <Route path="project/:projectId" element={<ProjectBoardPage />} />
+              <Route path="users" element={<UserManagementPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

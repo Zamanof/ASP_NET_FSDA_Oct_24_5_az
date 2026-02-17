@@ -11,6 +11,7 @@ export default function Layout() {
   const location = useLocation();
   const { user, logout } = useAuth();
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
+  const isAdmin = user?.roles?.includes('Admin') ?? false;
 
   return (
     <div className="flex min-h-screen">
@@ -25,6 +26,11 @@ export default function Layout() {
           {location.pathname.startsWith('/project/') && (
             <Link to={location.pathname} className={navLinkClass(isActive(location.pathname))}>
               Board
+            </Link>
+          )}
+          {isAdmin && (
+            <Link to="/users" className={navLinkClass(location.pathname === '/users')}>
+              Users &amp; roles
             </Link>
           )}
         </nav>

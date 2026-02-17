@@ -1,8 +1,6 @@
 ﻿using ASP_NET_18._TaskFlow_Refactoring.Common;
-using ASP_NET_18._TaskFlow_Refactoring.DTOs.Auth_DTOs;
-using ASP_NET_18._TaskFlow_Refactoring.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.Data;
+using ASP_NET_18._TaskFlow_Refactoring.DTOs;
+using ASP_NET_18._TaskFlow_Refactoring.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASP_NET_18._TaskFlow_Refactoring.Controllers;

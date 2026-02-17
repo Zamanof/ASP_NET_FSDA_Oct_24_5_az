@@ -11,37 +11,35 @@ import {
 } from '@dnd-kit/core';
 import { useDraggable } from '@dnd-kit/core';
 import { useDroppable } from '@dnd-kit/core';
-import { getProject } from '../api/projects';
-import { getTasksByProject, createTask, updateTask, deleteTask } from '../api/tasks';
+import { getProject, getProjectMembers, getAvailableUsersToAdd, addProjectMember, removeProjectMember } from '../api/projects';
+import { getTasksByProject, createTask, updateTask, updateTaskStatus, deleteTask } from '../api/tasks';
+import { useAuth } from '../auth/AuthContext';
 import { useToast } from '../context/ToastContext';
 import type { Project } from '../types/api';
 import type { TaskItem, TaskPriority, TaskStatus } from '../types/api';
+import type { ProjectMemberResponse, AvailableUser } from '../types/api';
 
 const FORBIDDEN_TASKS = 'Creating and editing tasks is available only to Managers and Admins.';
 
 const COLUMNS: TaskStatus[] = ['ToDo', 'InProgress', 'Done'];
 const PRIORITIES: TaskPriority[] = ['Low', 'Medium', 'High'];
 
-// Значения enum на бэкенде:
-// TaskStatus: ToDo = 0, InProgress = 1, Done = 2
-// TaskPriority: Low = 0, Medium = 1, High = 2
 const STATUS_TO_ENUM: Record<TaskStatus, number> = {
   ToDo: 0,
   InProgress: 1,
   Done: 2,
 };
-
 const PRIORITY_TO_ENUM: Record<TaskPriority, number> = {
   Low: 0,
   Medium: 1,
   High: 2,
 };
 
-function statusForApi(status: TaskStatus) {
+function statusForApi(status: TaskStatus): number {
   return STATUS_TO_ENUM[status];
 }
 
-function priorityForApi(priority: TaskPriority) {
+function priorityForApi(priority: TaskPriority): number {
   return PRIORITY_TO_ENUM[priority];
 }
 
@@ -120,13 +118,21 @@ const modalBoxClass = 'bg-white p-6 rounded-lg w-full max-w-[480px] max-h-[90vh]
 export default function ProjectBoardPage() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const id = projectId ? parseInt(projectId, 10) : NaN;
+  const canManageTasks = (user?.roles?.includes('Manager') || user?.roles?.includes('Admin')) ?? false;
+  const canManageMembers = canManageTasks;
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTask, setActiveTask] = useState<TaskItem | null>(null);
   const [modalTask, setModalTask] = useState<TaskItem | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [showMembers, setShowMembers] = useState(false);
+  const [members, setMembers] = useState<ProjectMemberResponse[]>([]);
+  const [availableUsers, setAvailableUsers] = useState<AvailableUser[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [memberEmail, setMemberEmail] = useState('');
   const [editTitle, setEditTitle] = useState('');
   const [editDesc, setEditDesc] = useState('');
   const [editStatus, setEditStatus] = useState<TaskStatus | ''>('');
@@ -171,13 +177,14 @@ export default function ProjectBoardPage() {
       prev.map((t) => (t.id === task.id ? { ...t, status: newStatus } : t))
     );
 
-    const res = await updateTask(task.id, {
-      title: task.title,
-      description: task.description ?? undefined,
-      // отправляем в API числовые enum-значения (0/1/2)
-      status: statusForApi(newStatus) as unknown as string,
-      priority: priorityForApi(task.priority) as unknown as string,
-    });
+    const res = canManageTasks
+      ? await updateTask(task.id, {
+          title: task.title,
+          description: task.description ?? undefined,
+          status: statusForApi(newStatus),
+          priority: priorityForApi(task.priority),
+        })
+      : await updateTaskStatus(task.id, statusForApi(newStatus));
     if (!res.success) {
       setTasks(prevTasks);
       const msg = res.status === 403 ? FORBIDDEN_TASKS : (res.error ?? 'Failed to update task');
@@ -207,13 +214,14 @@ export default function ProjectBoardPage() {
     setSaving(true);
     const status = (editStatus || modalTask.status) as TaskStatus;
     const priority = (editPriority || modalTask.priority) as TaskPriority;
-
-    const res = await updateTask(modalTask.id, {
-      title: editTitle.trim(),
-      description: editDesc || undefined,
-      status: statusForApi(status) as unknown as string,
-      priority: priorityForApi(priority) as unknown as string,
-    });
+    const res = canManageTasks
+      ? await updateTask(modalTask.id, {
+          title: editTitle.trim(),
+          description: editDesc || undefined,
+          status: statusForApi(status),
+          priority: priorityForApi(priority),
+        })
+      : await updateTaskStatus(modalTask.id, statusForApi(status));
     setSaving(false);
     if (res.success) {
       load();
@@ -228,6 +236,10 @@ export default function ProjectBoardPage() {
 
   const handleDelete = async () => {
     if (!modalTask) return;
+    if (!canManageTasks) {
+      toastError(FORBIDDEN_TASKS);
+      return;
+    }
     const result = await deleteTask(modalTask.id);
     if (result.ok) {
       load();
@@ -240,6 +252,70 @@ export default function ProjectBoardPage() {
     }
   };
 
+  const loadMembers = useCallback(async () => {
+    if (!id || !canManageMembers) return;
+    const res = await getProjectMembers(id);
+    if (res.success && res.data) setMembers(res.data);
+  }, [id, canManageMembers]);
+
+  const loadAvailableUsers = useCallback(async () => {
+    if (!id || !canManageMembers) return;
+    const res = await getAvailableUsersToAdd(id);
+    if (res.success && res.data) setAvailableUsers(res.data);
+  }, [id, canManageMembers]);
+
+  const openMembersModal = () => {
+    setShowMembers(true);
+    setMemberEmail('');
+    setSelectedUserId('');
+    loadMembers();
+    loadAvailableUsers();
+  };
+
+  const handleAddByEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id || !memberEmail.trim()) return;
+    const res = await addProjectMember(id, memberEmail.trim());
+    if (res.success) {
+      loadMembers();
+      loadAvailableUsers();
+      setMemberEmail('');
+      toastSuccess('Member added.');
+    } else {
+      toastError(res.error ?? 'Failed to add member.');
+    }
+  };
+
+  const handleAddSelected = async () => {
+    if (!id || !selectedUserId) return;
+    const res = await addProjectMember(id, selectedUserId);
+    if (res.success) {
+      loadMembers();
+      loadAvailableUsers();
+      setSelectedUserId('');
+      toastSuccess('Member added.');
+    } else {
+      toastError(res.error ?? 'Failed to add member.');
+    }
+  };
+
+  const handleRemoveMember = async (userId: string) => {
+    if (!id) return;
+    const res = await removeProjectMember(id, userId);
+    if (res.ok) {
+      loadMembers();
+      loadAvailableUsers();
+      toastSuccess('Member removed.');
+    } else {
+      toastError('Failed to remove member.');
+    }
+  };
+
+  const displayUser = (u: AvailableUser) => {
+    const name = [u.firstName, u.lastName].filter(Boolean).join(' ');
+    return name ? `${u.email} (${name})` : u.email;
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
@@ -250,7 +326,7 @@ export default function ProjectBoardPage() {
       id,
       editTitle.trim(),
       editDesc || undefined,
-      priorityForApi(priority) as unknown as string
+      priorityForApi(priority)
     );
     setSaving(false);
     if (res.success && res.data) {
@@ -267,8 +343,7 @@ export default function ProjectBoardPage() {
     }
   };
 
-  const tasksList = Array.isArray(tasks) ? tasks : [];
-  const tasksByStatus = (status: string) => tasksList.filter((t) => t.status === status);
+  const tasksByStatus = (status: string) => tasks.filter((t) => t.status === status);
 
   if (loading && !project) {
     return <p className="text-[#5e6c84]">Loading…</p>;
@@ -290,7 +365,7 @@ export default function ProjectBoardPage() {
 
   return (
     <>
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-6 flex-wrap">
         <button
           type="button"
           onClick={() => navigate('/')}
@@ -302,19 +377,32 @@ export default function ProjectBoardPage() {
         {project.description && (
           <span className="text-sm text-[#5e6c84]">{project.description}</span>
         )}
-        <button
-          type="button"
-          onClick={() => {
-            setShowCreate(true);
-            setEditTitle('');
-            setEditDesc('');
-            setEditPriority('Medium');
-            setError('');
-          }}
-          className="ml-auto py-2 px-4 rounded font-medium bg-[#0052cc] text-white hover:bg-[#0747a6] cursor-pointer"
-        >
-          Create task
-        </button>
+        <div className="ml-auto flex items-center gap-2">
+          {canManageMembers && (
+            <button
+              type="button"
+              onClick={openMembersModal}
+              className="py-2 px-4 rounded font-medium border border-[#ebecf0] bg-white text-[#172b4d] hover:bg-[#ebecf0] cursor-pointer"
+            >
+              Members
+            </button>
+          )}
+          {canManageTasks && (
+            <button
+              type="button"
+              onClick={() => {
+                setShowCreate(true);
+                setEditTitle('');
+                setEditDesc('');
+                setEditPriority('Medium');
+                setError('');
+              }}
+              className="py-2 px-4 rounded font-medium bg-[#0052cc] text-white hover:bg-[#0747a6] cursor-pointer"
+            >
+              Create task
+            </button>
+          )}
+        </div>
       </div>
 
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
@@ -339,58 +427,71 @@ export default function ProjectBoardPage() {
           <div className={modalBoxClass} onClick={(e) => e.stopPropagation()}>
             <h2 className="mt-0 mb-4 text-lg font-semibold text-[#172b4d]">Task</h2>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-[#172b4d] mb-1">Title</label>
-                <input
-                  type="text"
-                  className="w-full px-3 py-2 border border-[#ebecf0] rounded bg-white text-[#172b4d] focus:outline-none focus:border-[#0052cc] focus:ring-2 focus:ring-[#deebff]"
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[#172b4d] mb-1">Description</label>
-                <textarea
-                  className="w-full px-3 py-2 border border-[#ebecf0] rounded bg-white text-[#172b4d] focus:outline-none focus:border-[#0052cc] focus:ring-2 focus:ring-[#deebff] resize-y"
-                  value={editDesc}
-                  onChange={(e) => setEditDesc(e.target.value)}
-                  rows={3}
-                />
-              </div>
+              {canManageTasks ? (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-[#172b4d] mb-1">Title</label>
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 border border-[#ebecf0] rounded bg-white text-[#172b4d] focus:outline-none focus:border-[#0052cc] focus:ring-2 focus:ring-[#deebff]"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#172b4d] mb-1">Description</label>
+                    <textarea
+                      className="w-full px-3 py-2 border border-[#ebecf0] rounded bg-white text-[#172b4d] focus:outline-none focus:border-[#0052cc] focus:ring-2 focus:ring-[#deebff] resize-y"
+                      value={editDesc}
+                      onChange={(e) => setEditDesc(e.target.value)}
+                      rows={3}
+                    />
+                  </div>
+                </>
+              ) : (
+                <div>
+                  <div className="text-sm font-medium text-[#172b4d] mb-1">{modalTask.title}</div>
+                  {modalTask.description && <p className="text-sm text-[#5e6c84]">{modalTask.description}</p>}
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-[#172b4d] mb-1">Status</label>
                 <select
                   className="w-full px-3 py-2 border border-[#ebecf0] rounded bg-white text-[#172b4d] focus:outline-none focus:border-[#0052cc] focus:ring-2 focus:ring-[#deebff]"
                   value={editStatus}
-                  onChange={(e) => setEditStatus(e.target.value as TaskStatus)}
+                  onChange={(e) => setEditStatus(e.target.value)}
                 >
                   {COLUMNS.map((s) => (
-                    <option key={s} value={s}>{s}</option>
+                    <option key={s} value={s}>{columnLabel(s)}</option>
                   ))}
                 </select>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-[#172b4d] mb-1">Priority</label>
-                <select
-                  className="w-full px-3 py-2 border border-[#ebecf0] rounded bg-white text-[#172b4d] focus:outline-none focus:border-[#0052cc] focus:ring-2 focus:ring-[#deebff]"
-                  value={editPriority}
-                  onChange={(e) => setEditPriority(e.target.value as TaskPriority)}
-                >
-                  {PRIORITIES.map((p) => (
-                    <option key={p} value={p}>{p}</option>
-                  ))}
-                </select>
-              </div>
+              {canManageTasks && (
+                <div>
+                  <label className="block text-sm font-medium text-[#172b4d] mb-1">Priority</label>
+                  <select
+                    className="w-full px-3 py-2 border border-[#ebecf0] rounded bg-white text-[#172b4d] focus:outline-none focus:border-[#0052cc] focus:ring-2 focus:ring-[#deebff]"
+                    value={editPriority}
+                    onChange={(e) => setEditPriority(e.target.value)}
+                  >
+                    {PRIORITIES.map((p) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
             {error && <p className="text-xs text-red-600 mt-2">{error}</p>}
             <div className="flex justify-between gap-2 mt-5">
-              <button
-                type="button"
-                onClick={handleDelete}
-                className="py-2 px-4 rounded font-medium bg-red-600 text-white hover:bg-red-700 cursor-pointer"
-              >
-                Delete
-              </button>
+              {canManageTasks ? (
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  className="py-2 px-4 rounded font-medium bg-red-600 text-white hover:bg-red-700 cursor-pointer"
+                >
+                  Delete
+                </button>
+              ) : <span />}
               <div className="flex gap-2">
                 <button type="button" onClick={closeModal} className="py-2 px-4 rounded font-medium border border-[#ebecf0] bg-white text-[#172b4d] hover:bg-[#ebecf0] cursor-pointer">
                   Cancel
@@ -399,6 +500,75 @@ export default function ProjectBoardPage() {
                   {saving ? 'Saving…' : 'Save'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showMembers && (
+        <div className={modalOverlayClass} onClick={() => setShowMembers(false)} role="dialog" aria-modal="true">
+          <div className={modalBoxClass} onClick={(e) => e.stopPropagation()}>
+            <h2 className="mt-0 mb-4 text-lg font-semibold text-[#172b4d]">Project members</h2>
+            <div className="space-y-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-[#172b4d] mb-1">Select from list</label>
+                <div className="flex gap-2">
+                  <select
+                    className="flex-1 px-3 py-2 border border-[#ebecf0] rounded bg-white text-[#172b4d] focus:outline-none focus:border-[#0052cc] focus:ring-2 focus:ring-[#deebff]"
+                    value={selectedUserId}
+                    onChange={(e) => setSelectedUserId(e.target.value)}
+                  >
+                    <option value="">Choose user…</option>
+                    {availableUsers.map((u) => (
+                      <option key={u.id} value={u.id}>{displayUser(u)}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={handleAddSelected}
+                    disabled={!selectedUserId}
+                    className="py-2 px-4 rounded font-medium bg-[#0052cc] text-white hover:bg-[#0747a6] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    Add
+                  </button>
+                </div>
+                {availableUsers.length === 0 && <p className="text-xs text-[#5e6c84] mt-1">All users are already in the project.</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#172b4d] mb-1">Or add by email</label>
+                <form onSubmit={handleAddByEmail} className="flex gap-2">
+                  <input
+                    type="text"
+                    className="flex-1 px-3 py-2 border border-[#ebecf0] rounded bg-white text-[#172b4d] placeholder:text-[#97a0af] focus:outline-none focus:border-[#0052cc] focus:ring-2 focus:ring-[#deebff]"
+                    value={memberEmail}
+                    onChange={(e) => setMemberEmail(e.target.value)}
+                    placeholder="Email"
+                  />
+                  <button type="submit" className="py-2 px-4 rounded font-medium bg-[#0052cc] text-white hover:bg-[#0747a6] cursor-pointer">
+                    Add
+                  </button>
+                </form>
+              </div>
+            </div>
+            <ul className="space-y-2 max-h-60 overflow-auto">
+              {members.map((m) => (
+                <li key={m.userId} className="flex items-center justify-between py-2 px-3 bg-[#f4f5f7] rounded">
+                  <span className="text-sm text-[#172b4d]">{m.email}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveMember(m.userId)}
+                    className="text-sm text-red-600 hover:underline"
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+              {members.length === 0 && <p className="text-sm text-[#5e6c84]">No members yet.</p>}
+            </ul>
+            <div className="mt-4 flex justify-end">
+              <button type="button" onClick={() => setShowMembers(false)} className="py-2 px-4 rounded font-medium border border-[#ebecf0] bg-white text-[#172b4d] hover:bg-[#ebecf0] cursor-pointer">
+                Close
+              </button>
             </div>
           </div>
         </div>
@@ -433,7 +603,7 @@ export default function ProjectBoardPage() {
                 <select
                   className="w-full px-3 py-2 border border-[#ebecf0] rounded bg-white text-[#172b4d] focus:outline-none focus:border-[#0052cc] focus:ring-2 focus:ring-[#deebff]"
                   value={editPriority}
-                  onChange={(e) => setEditPriority(e.target.value as TaskPriority)}
+                  onChange={(e) => setEditPriority(e.target.value)}
                 >
                   {PRIORITIES.map((p) => (
                     <option key={p} value={p}>{p}</option>

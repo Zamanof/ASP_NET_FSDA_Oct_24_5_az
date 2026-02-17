@@ -40,7 +40,6 @@ function loadStored(): StoredAuth | null {
     const data = JSON.parse(raw) as StoredAuth;
     if (data.token && data.refreshToken && data.email) return data;
   } catch {
-    /* ignore */
   }
   return null;
 }
@@ -55,11 +54,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const applyAuth = useCallback((data: AuthResponse) => {
-    // AuthResponse приходит с полем accessToken, а не token
-    setAuthTokens(data.accessToken, data.refreshToken);
+    setAuthTokens(data.token, data.refreshToken);
     setUser({ email: data.email, roles: [...(data.roles ?? [])] });
     saveStored({
-      token: data.accessToken,
+      token: data.token,
       refreshToken: data.refreshToken,
       email: data.email,
       roles: [...(data.roles ?? [])],

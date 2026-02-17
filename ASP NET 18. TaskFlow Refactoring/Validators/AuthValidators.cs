@@ -1,4 +1,4 @@
-﻿using ASP_NET_18._TaskFlow_Refactoring.DTOs.Auth_DTOs;
+﻿using ASP_NET_18._TaskFlow_Refactoring.DTOs;
 using FluentValidation;
 
 namespace ASP_NET_18._TaskFlow_Refactoring.Validators;
@@ -42,7 +42,7 @@ public class LoginValidator : AbstractValidator<LoginRequestDto>
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Password is required")
             .MinimumLength(6).WithMessage("Password must be at least 6 characters long")
-            .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)").WithMessage("Passwords must have at least one digit ('0'-'9').,Passwords must have at least one lowercase ('a'-'z').,Passwords must have at least one lowercase ('A'-'Z')");
+            .Password();
     }
 }
 

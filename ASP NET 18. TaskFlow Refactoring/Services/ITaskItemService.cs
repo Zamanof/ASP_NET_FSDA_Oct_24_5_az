@@ -1,9 +1,8 @@
 ﻿using ASP_NET_18._TaskFlow_Refactoring.Models;
-using ASP_NET_18._TaskFlow_Refactoring.DTOs.TaskItem_DTOs;
 using ASP_NET_18._TaskFlow_Refactoring.Common;
 using ASP_NET_18._TaskFlow_Refactoring.DTOs;
 
-namespace ASP_NET_18._TaskFlow_Refactoring.Services.Interfaces;
+namespace ASP_NET_18._TaskFlow_Refactoring.Services;
 
 public interface ITaskItemService
 {

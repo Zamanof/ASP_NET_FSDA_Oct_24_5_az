@@ -6,7 +6,8 @@ export interface ApiResponse<T> {
 }
 
 export interface AuthResponse {
-  accessToken: string;
+  token: string;
+  accessToken?: string;
   expiresAt: string;
   refreshToken: string;
   refreshTokenExpiresAt: string;
@@ -18,9 +19,31 @@ export interface Project {
   id: number;
   name: string;
   description?: string;
-  createdAt: string;
-  updatedAt?: string;
-  tasksCount: number;
+  taskCount: number;
+  ownerId?: string;
+}
+
+export interface UserWithRoles {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  roles: string[];
+}
+
+export interface ProjectMemberResponse {
+  userId: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  joinedAt: string;
+}
+
+export interface AvailableUser {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 export type TaskStatus = 'ToDo' | 'InProgress' | 'Done';
@@ -34,8 +57,6 @@ export interface TaskItem {
   priority: TaskPriority;
   projectId: number;
   projectName: string;
-  createdAt: string;
-  updatedAt?: string;
 }
 
 export interface PagedResult<T> {

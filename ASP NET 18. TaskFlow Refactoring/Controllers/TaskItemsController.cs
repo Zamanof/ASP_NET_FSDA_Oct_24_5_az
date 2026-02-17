@@ -1,10 +1,8 @@
-﻿using ASP_NET_18._TaskFlow_Refactoring.Models;
-using ASP_NET_18._TaskFlow_Refactoring.Services.Interfaces;
-using ASP_NET_18._TaskFlow_Refactoring.DTOs.TaskItem_DTOs;
-using Microsoft.AspNetCore.Mvc;
-using ASP_NET_18._TaskFlow_Refactoring.Common;
+﻿using ASP_NET_18._TaskFlow_Refactoring.Common;
 using ASP_NET_18._TaskFlow_Refactoring.DTOs;
+using ASP_NET_18._TaskFlow_Refactoring.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ASP_NET_18._TaskFlow_Refactoring.Controllers;
 
@@ -24,6 +22,8 @@ public class TaskItemsController : ControllerBase
     /// Initializes a new instance of the <see cref="TaskItemsController"/> class.
     /// </summary>
     /// <param name="taskItemService">Service for task item operations.</param>
+    /// <param name="projectService"></param>
+    /// <param name="authorizationService"></param>
     public TaskItemsController(ITaskItemService taskItemService, IProjectService projectService, IAuthorizationService authorizationService)
     {
         _taskItemService = taskItemService;
@@ -289,7 +289,7 @@ public class TaskItemsController : ControllerBase
     /// Query parameters for pagination, filtering, searching, and sorting task items.
     /// </param>
     /// <returns>
-    /// A paged result containing task items that match the specified criteria, wrapped in <see cref="ApiResponse{PagedResult{TaskItemResponseDto}}"/>.
+    /// A paged result containing task items that match the specified criteria, wrapped in .
     /// </returns>
     /// <response code="200">Returns the paged list of task items.</response>
     [HttpGet]

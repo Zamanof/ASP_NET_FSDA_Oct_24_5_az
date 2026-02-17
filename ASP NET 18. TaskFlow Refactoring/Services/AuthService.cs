@@ -1,8 +1,7 @@
 ﻿using ASP_NET_18._TaskFlow_Refactoring.Config;
 using ASP_NET_18._TaskFlow_Refactoring.Data;
-using ASP_NET_18._TaskFlow_Refactoring.DTOs.Auth_DTOs;
+using ASP_NET_18._TaskFlow_Refactoring.DTOs;
 using ASP_NET_18._TaskFlow_Refactoring.Models;
-using ASP_NET_18._TaskFlow_Refactoring.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -16,7 +15,6 @@ namespace ASP_NET_18._TaskFlow_Refactoring.Services;
 public class AuthService : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IConfiguration _configuration;
     private readonly TaskFlowDBContext _context;
     private readonly JwtConfig _jwtConfig;
 
@@ -29,7 +27,6 @@ public class AuthService : IAuthService
         IOptions<JwtConfig> jwtConfig)
     {
         _userManager = userManager;
-        _configuration = configuration;
         _context = context;
         _jwtConfig = jwtConfig.Value;
     }

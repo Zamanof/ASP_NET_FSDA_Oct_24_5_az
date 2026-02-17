@@ -1,11 +1,9 @@
-﻿using ASP_NET_18._TaskFlow_Refactoring.Data;
-using ASP_NET_18._TaskFlow_Refactoring.Models;
-using ASP_NET_18._TaskFlow_Refactoring.Services.Interfaces;
-using ASP_NET_18._TaskFlow_Refactoring.DTOs.TaskItem_DTOs;
-using Microsoft.EntityFrameworkCore;
-using AutoMapper;
-using ASP_NET_18._TaskFlow_Refactoring.Common;
+﻿using ASP_NET_18._TaskFlow_Refactoring.Common;
+using ASP_NET_18._TaskFlow_Refactoring.Data;
 using ASP_NET_18._TaskFlow_Refactoring.DTOs;
+using ASP_NET_18._TaskFlow_Refactoring.Models;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace ASP_NET_18._TaskFlow_Refactoring.Services;
 

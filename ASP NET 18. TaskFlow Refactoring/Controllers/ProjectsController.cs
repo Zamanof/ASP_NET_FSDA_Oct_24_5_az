@@ -1,6 +1,6 @@
 ﻿using ASP_NET_18._TaskFlow_Refactoring.Common;
-using ASP_NET_18._TaskFlow_Refactoring.DTOs.Project_DTOs;
-using ASP_NET_18._TaskFlow_Refactoring.Services.Interfaces;
+using ASP_NET_18._TaskFlow_Refactoring.DTOs;
+using ASP_NET_18._TaskFlow_Refactoring.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -88,7 +88,7 @@ public class ProjectsController : ControllerBase
     /// <summary>
     /// Retrieves all projects.
     /// </summary>
-    /// <returns>A list of all projects wrapped in <see cref="ApiResponse{IEnumerable{ProjectResponseDto}}"/>.</returns>
+    /// <returns>A list of all projects wrapped in"/>.</returns>
     /// <response code="200">Returns the list of projects.</response>
     [HttpGet]
     public async Task<ActionResult<ApiResponse<IEnumerable<ProjectResponseDto>>>> GetAll()
@@ -133,7 +133,7 @@ public class ProjectsController : ControllerBase
     /// Deletes a project by its identifier.
     /// </summary>
     /// <param name="id">The project identifier.</param>
-    /// <returns>Result of the delete operation wrapped in <see cref="ApiResponse{object}"/>.</returns>
+    /// <returns>Result of the delete operation wrapped in</returns>
     /// <response code="200">The project was successfully deleted.</response>
     /// <response code="404">A project with the specified identifier was not found.</response>
     [HttpDelete("{id}")]
