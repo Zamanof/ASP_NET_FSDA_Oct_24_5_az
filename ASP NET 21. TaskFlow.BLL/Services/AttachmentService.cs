@@ -1,10 +1,10 @@
-﻿using ASP_NET_20._TaskFlow_FIle_attachment.Data;
-using ASP_NET_20._TaskFlow_FIle_attachment.DTOs;
-using ASP_NET_20._TaskFlow_FIle_attachment.Models;
-using ASP_NET_20._TaskFlow_FIle_attachment.Storage;
+﻿using ASP_NET_21._TaskFlow.BLL.DTOs;
+using ASP_NET_21._TaskFlow.BLL.Storage;
+using ASP_NET_21._TaskFlow.Data;
+using ASP_NET_21._TaskFlow.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ASP_NET_20._TaskFlow_FIle_attachment.Services;
+namespace ASP_NET_21._TaskFlow.BLL.Services;
 
 public class AttachmentService : IAttachmentService
 {
