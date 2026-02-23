@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace ASP_NET_21._TaskFlow.BLL.DTOs;
 
@@ -63,8 +63,8 @@ public class TaskItemQueryParams
     public void Validate()
     {
         if (Page < 1) Page = 1;
-        if (Size < 1) Page = 10;
-        if (Size > 100) Page = 100;
+        if (Size < 1) Size = 10;
+        if (Size > 100) Size = 100;
         if (string.IsNullOrWhiteSpace(SortDirection)) SortDirection = "asc";
         SortDirection = SortDirection.ToLower();
         if (SortDirection != "asc" && SortDirection != "desc") SortDirection = "asc";

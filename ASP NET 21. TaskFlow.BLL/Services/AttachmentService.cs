@@ -1,8 +1,7 @@
-﻿using ASP_NET_21._TaskFlow.BLL.DTOs;
+using ASP_NET_21._TaskFlow.BLL.DTOs;
 using ASP_NET_21._TaskFlow.BLL.Storage;
-using ASP_NET_21._TaskFlow.Data;
+using ASP_NET_21._TaskFlow.DAL;
 using ASP_NET_21._TaskFlow.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace ASP_NET_21._TaskFlow.BLL.Services;
 
@@ -10,50 +9,47 @@ public class AttachmentService : IAttachmentService
 {
     public const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5MB
     public static readonly string[] AllowedExtensions = {
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".pdf",
-        ".txt",
-        ".zip",
+        ".jpg", ".jpeg", ".png", ".pdf", ".txt", ".zip",
     };
 
     public static readonly string[] AllowedContentTypes = {
-        "image/jpeg",
-        "image/png",
-        "application/pdf",
-        "text/plain",
-        "application/zip",
-        "application/x-zip-compressed"
+        "image/jpeg", "image/png", "application/pdf", "text/plain",
+        "application/zip", "application/x-zip-compressed"
     };
 
-    private readonly TaskFlowDBContext _context;
+    private readonly ITaskItemRepository _taskItemRepository;
+    private readonly ITaskAttachmentRepository _taskAttachmentRepository;
     private readonly IFileStorage _storage;
 
-    public AttachmentService(TaskFlowDBContext context, IFileStorage storage)
+    public AttachmentService(
+        ITaskItemRepository taskItemRepository,
+        ITaskAttachmentRepository taskAttachmentRepository,
+        IFileStorage storage)
     {
-        _context = context;
+        _taskItemRepository = taskItemRepository;
+        _taskAttachmentRepository = taskAttachmentRepository;
         _storage = storage;
     }
 
     public async Task<AttachmentResponseDto?> UploadAsync(int taskId, Stream stream, string originalFileName, string contentType, long length, string userId, CancellationToken cancellationToken = default)
     {
         if (length > MaxFileSizeBytes)
-            throw new ArgumentException($"File size must not exceed {MaxFileSizeBytes/(1024 * 1024)} MB");
+            throw new ArgumentException($"File size must not exceed {MaxFileSizeBytes / (1024 * 1024)} MB");
 
         var ext = Path.GetExtension(originalFileName)?.ToLowerInvariant();
-
         if (string.IsNullOrEmpty(ext) || !AllowedExtensions.Contains(ext))
             throw new ArgumentException($"Allowed extensions: {string.Join(", ", AllowedExtensions)}");
 
         if (!AllowedContentTypes.Contains(contentType, StringComparer.OrdinalIgnoreCase))
             throw new ArgumentException($"Allowed content type: {string.Join(", ", AllowedContentTypes)}");
 
-        var task = await _context.TaskItems.FindAsync([taskId], cancellationToken);
+        var task = await _taskItemRepository.FindAsync(taskId);
+        if (task is null)
+            throw new ArgumentException($"Task with ID {taskId} not found.");
 
         var folderKey = $"tasks/{taskId}";
-
         var info = await _storage.UploadAsync(stream, originalFileName, contentType, folderKey, cancellationToken);
+
         var attachment = new TaskAttachment
         {
             TaskItemId = taskId,
@@ -65,8 +61,7 @@ public class AttachmentService : IAttachmentService
             UploadedAt = DateTimeOffset.UtcNow
         };
 
-        _context.TaskAttachments.Add(attachment);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _taskAttachmentRepository.AddAsync(attachment);
 
         return new AttachmentResponseDto
         {
@@ -79,27 +74,21 @@ public class AttachmentService : IAttachmentService
             UploadedAt = attachment.UploadedAt
         };
     }
+
     public async Task<(Stream stream, string fileName, string contentType)?> GetDownloadAsync(int attachmentId, CancellationToken cancellationToken = default)
     {
-        var att = await _context.TaskAttachments.FirstOrDefaultAsync(a => a.Id == attachmentId, cancellationToken);
-
-        if (att is null)
-            return null;
+        var att = await _taskAttachmentRepository.GetByIdAsync(attachmentId);
+        if (att is null) return null;
 
         var key = $"tasks/{att.TaskItemId}/{att.StoredFileName}";
-
         var stream = await _storage.OpenReadAsync(key, cancellationToken);
-
         return (stream, att.OriginalFileName, att.ContentType);
     }
+
     public async Task<TaskAttachmentInfo?> GetAttachmentInfoAsync(int attachmentId, CancellationToken cancellationToken = default)
     {
-        var att = await _context.TaskAttachments
-                                    .Include(a => a.TaskItem)
-                                    .FirstOrDefaultAsync(a => a.Id == attachmentId, cancellationToken);
-
-        if (att is null)
-            return null;
+        var att = await _taskAttachmentRepository.GetByIdWithTaskItemAsync(attachmentId);
+        if (att is null) return null;
 
         return new TaskAttachmentInfo
         {
@@ -108,26 +97,18 @@ public class AttachmentService : IAttachmentService
             ProjectId = att.TaskItem.ProjectId,
             StoredFileName = att.StoredFileName,
             StorageKey = $"tasks/{att.TaskItemId}/{att.StoredFileName}",
-
             UploadedByUserId = att.UploadedByUserId,
-
         };
     }
+
     public async Task<bool> DeleteAsync(int attachmentId, CancellationToken cancellationToken = default)
     {
-        var att = await _context.TaskAttachments.FirstOrDefaultAsync(a => a.Id == attachmentId, cancellationToken);
-
-        if (att is null)
-            return false;
+        var att = await _taskAttachmentRepository.GetByIdAsync(attachmentId);
+        if (att is null) return false;
 
         var key = $"tasks/{att.TaskItemId}/{att.StoredFileName}";
-
-        _context.TaskAttachments.Remove(att);
-
-        await _context.SaveChangesAsync(cancellationToken);
-
+        await _taskAttachmentRepository.RemoveAsync(att);
         await _storage.DeleteAsync(key, cancellationToken);
-
         return true;
     }
 }

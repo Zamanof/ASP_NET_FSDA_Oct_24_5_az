@@ -1,7 +1,6 @@
-﻿using ASP_NET_21._TaskFlow.Data;
+using ASP_NET_21._TaskFlow.BLL.Services;
 using ASP_NET_21._TaskFlow.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace ASP_NET_21._TaskFlow.API.Authorization;
@@ -9,16 +8,16 @@ namespace ASP_NET_21._TaskFlow.API.Authorization;
 public class ProjectMemberOrHigherHandler
     : AuthorizationHandler<ProjectMemberOrHigherRequirment, Project>
 {
-    private readonly TaskFlowDBContext _context;
+    private readonly IProjectService _projectService;
 
-    public ProjectMemberOrHigherHandler(TaskFlowDBContext context)
+    public ProjectMemberOrHigherHandler(IProjectService projectService)
     {
-        _context = context;
+        _projectService = projectService;
     }
 
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
-        ProjectMemberOrHigherRequirment requirement, 
+        ProjectMemberOrHigherRequirment requirement,
         Project resource)
     {
         var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -38,11 +37,7 @@ public class ProjectMemberOrHigherHandler
             return;
         }
 
-        var isMemeber = await _context
-                            .ProjectMembers
-                            .AnyAsync(m => m.ProjectId == resource.Id && m.UserId == userId);
-
-        if (isMemeber)
+        if (await _projectService.IsMemberAsync(resource.Id, userId))
             context.Succeed(requirement);
     }
 }

@@ -1,4 +1,4 @@
-﻿using ASP_NET_21._TaskFlow.API.Authorization;
+using ASP_NET_21._TaskFlow.API.Authorization;
 using ASP_NET_21._TaskFlow.API.Storage;
 using ASP_NET_21._TaskFlow.API.Validators;
 using ASP_NET_21._TaskFlow.BLL.Config;
@@ -244,7 +244,14 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IFileStorage, LocalDiskStorage>();
         services.AddScoped<IAttachmentService, AttachmentService>();
+        // DAL repositories
         services.AddScoped<IProjectRepository, ProjectRepository>();
+        services.AddScoped<ITaskItemRepository, TaskItemRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IProjectMemberRepository, ProjectMemberRepository>();
+        services.AddScoped<ITaskAttachmentRepository, TaskAttachmentRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+
         return services;
     }
 }
