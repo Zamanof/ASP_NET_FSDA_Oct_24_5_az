@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>ASP_NET_22._TaskFlow_CQRS.Api</RootNamespace>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);1591</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.12" />
+			  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
+<PackageReference Include="Microsoft.OpenApi" Version="1.6.25" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ASP NET 22. TaskFlow CQRS.Application\ASP NET 22. TaskFlow CQRS.Application.csproj" />
+		<ProjectReference Include="..\ASP NET 22. TaskFlow CQRS.Infrastructure\ASP NET 22. TaskFlow CQRS.Infrastructure.csproj" />
+	</ItemGroup>
+
+</Project>

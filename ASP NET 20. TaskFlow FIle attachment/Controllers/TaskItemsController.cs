@@ -11,7 +11,7 @@ namespace ASP_NET_20._TaskFlow_FIle_attachment.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Policy ="UserOrAbove")]
+[Authorize(Policy = "UserOrAbove")]
 public class TaskItemsController : ControllerBase
 {
     private readonly ITaskItemService _taskItemService;
@@ -91,6 +91,7 @@ public class TaskItemsController : ControllerBase
     //[Tags("tasks get all")]
     public async Task<ActionResult<ApiResponse<IEnumerable<TaskItemResponseDto>>>> GetAll()
     {
+
         var taskItems = await _taskItemService.GetAllAsync();
         return Ok(ApiResponse<IEnumerable<TaskItemResponseDto>>.SuccessResponse(taskItems));
     }
@@ -106,7 +107,7 @@ public class TaskItemsController : ControllerBase
     //[Tags("get by id")]
     public async Task<ActionResult<ApiResponse<TaskItemResponseDto>>> GetById(int id)
     {
-        var task =await _taskItemService.GetTaskEntityAsync(id);
+        var task = await _taskItemService.GetTaskEntityAsync(id);
 
         if (task == null)
             return NotFound();
@@ -141,7 +142,7 @@ public class TaskItemsController : ControllerBase
     /// <returns>A list of task items for the specified project.</returns>
     /// <response code="200">Returns the list of task items for the project.</response>
     [HttpGet("project/{projectId}")]
-    public async Task<ActionResult<ApiResponse<IEnumerable<TaskItemResponseDto>>>> 
+    public async Task<ActionResult<ApiResponse<IEnumerable<TaskItemResponseDto>>>>
         GetByProjectId(int projectId)
     {
         var project = await _projectService.GetProjectEntityAsync(projectId);
@@ -247,7 +248,7 @@ public class TaskItemsController : ControllerBase
 
 
     [HttpPatch("{id}/status")]
-    public async Task<ActionResult<ApiResponse<TaskItemResponseDto>>> 
+    public async Task<ActionResult<ApiResponse<TaskItemResponseDto>>>
         UpdateStatus(int id, [FromBody] TaskStatusUpdateRequest request)
     {
         if (!ModelState.IsValid)

@@ -1,7 +1,7 @@
 using FluentValidation.AspNetCore;
-using TaskFlow.Api.Extensions;
-using TaskFlow.Application.Extensions;
-using TaskFlow.Infrastructure.Extensions;
+using ASP_NET_22._TaskFlow_CQRS.Api.Extensions;
+using ASP_NET_22._TaskFlow_CQRS.Application.Extensions;
+using ASP_NET_22._TaskFlow_CQRS.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
