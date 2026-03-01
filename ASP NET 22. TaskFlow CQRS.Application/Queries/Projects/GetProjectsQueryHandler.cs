@@ -1,12 +1,12 @@
 ﻿using ASP_NET_22._TaskFlow_CQRS.Application.DTOs;
 using ASP_NET_22._TaskFlow_CQRS.Application.Interfaces;
+using ASP_NET_22._TaskFlow_CQRS.Domain;
 using AutoMapper;
 using MediatR;
-using System.Data;
 
 namespace ASP_NET_22._TaskFlow_CQRS.Application.Queries.Projects;
 
-internal class GetProjectsQueryHandler : IRequestHandler<GetProjectsQuery, IEnumerable<ProjectResponseDto>>
+public class GetProjectsQueryHandler : IRequestHandler<GetProjectsQuery, IEnumerable<ProjectResponseDto>>
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IMapper _mapper;
